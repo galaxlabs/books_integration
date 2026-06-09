@@ -9,7 +9,11 @@ from frappe.query_builder.functions import IfNull, Max
 
 
 @frappe.whitelist(methods=["GET"])
-def get_pending_docs(instance):
+def get_pending_docs(instance=None, all_docs=None, **kwargs):
+    instance = instance or frappe.form_dict.get("instance")
+    if not instance:
+        return {"success": False, "message": "Books instance not found", "data": []}
+
     item_rates = get_item_rates() or {}
     queued_docs = frappe.db.get_all(
         "Books Sync Queue",
