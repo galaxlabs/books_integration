@@ -2,7 +2,7 @@ app_name = "books_integration"
 app_title = "Books Integration"
 app_publisher = "Wahni IT Solutions"
 app_description = "Frappe Books Integration for ERPNext"
-app_email = "akshay@wahni.com"
+app_email = "galaxylab2020@gmail.com"
 app_license = "mit"
 
 # Apps
