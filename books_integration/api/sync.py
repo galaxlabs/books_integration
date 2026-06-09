@@ -10,12 +10,7 @@ from frappe.query_builder.functions import IfNull, Max
 
 @frappe.whitelist(methods=["GET"])
 def get_pending_docs(instance):
-    item_rates = get_item_rates()
-    if not item_rates:
-        return {
-            "success": "false",
-            "message": "price list not selected in Books Item Settings"
-        }
+    item_rates = get_item_rates() or {}
     queued_docs = frappe.db.get_all(
         "Books Sync Queue",
         filters={"books_instance": instance},
@@ -33,7 +28,7 @@ def get_pending_docs(instance):
         existing_books_ref = frappe.db.get_value(
             "Books Reference",
             {
-                "document_type": queued_doc.doctype_name,
+                "document_type": queued_doc.document_type,
                 "document_name": queued_doc.document_name,
             },
             "books_name"
@@ -75,6 +70,7 @@ def initiate_master_sync(instance, records):
                     record.get("referenceType"), "erpn"
                 ),
                 "document_name": record.get("documentName"),
+                "books_instance": instance,
             }
             is_pending = frappe.db.exists(data)
 

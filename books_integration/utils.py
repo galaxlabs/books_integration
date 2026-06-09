@@ -39,6 +39,9 @@ def get_doctype_name(doctype: str, target, doc=None):
             return doc.get("role")
         return BOOKS_DOCTYPE_MAP.get(doctype)
 
+    if doctype in ("Customer", "Supplier"):
+        return "Party"
+
     return ERP_DOCTYPE_MAP.get(doctype)
 
 

@@ -562,6 +562,24 @@ class PriceList(DocConverterBase):
         super().__init__(instance, dirty_doc, target)
 
 
+    def _fill_missing_values_for_fbooks(self):
+        self.converted_doc["priceListItem"] = []
+        item_prices = frappe.get_all(
+            "Item Price",
+            filters={"price_list": self._dirty_doc.get("name"), "selling": self._dirty_doc.get("selling")},
+            fields=["name", "item_code", "uom", "price_list", "price_list_rate"],
+            order_by="item_code asc",
+        )
+        for price in item_prices:
+            self.converted_doc["priceListItem"].append({
+                "name": price.name,
+                "item": price.item_code,
+                "unit": price.uom,
+                "parent": price.price_list,
+                "rate": price.price_list_rate,
+            })
+
+
 class ItemPrice(DocConverterBase):
     def __init__(self, instance, dirty_doc, target):
         self.field_map = {

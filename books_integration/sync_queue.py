@@ -58,28 +58,27 @@ def document_should_sync(doctype):
 
     # return False
 
+def _queue_doc(instance, doctype, docname):
+    if not docname:
+        return
+
+    queue_doc = {
+        "doctype": "Books Sync Queue",
+        "document_name": docname,
+        "document_type": doctype,
+        "books_instance": instance,
+    }
+    if not frappe.db.exists(queue_doc):
+        frappe.get_doc(queue_doc).insert()
+
+
 def add_item(doc, method=None):
-# runs when item price is modified
+    # Runs when Item Price is modified. Queue both the item and its parent price list.
     instances = frappe.db.get_all(
         "Books Instance",
         # filters={"enable_sync": 1},
         pluck="name",
     )
     for instance in instances:
-        is_exists_in_queue = frappe.db.exists(
-            {
-                "doctype": "Books Sync Queue",
-                "document_name": doc.item_code,
-                "document_type": "Item",
-                "books_instance": instance,
-            }
-        )
-        if not is_exists_in_queue:
-            frappe.get_doc(
-            {
-                "doctype": "Books Sync Queue",
-                "document_name": doc.item_code,
-                "document_type": "Item",
-                "books_instance": instance,
-            }
-            ).insert()
+        _queue_doc(instance, "Item", doc.item_code)
+        _queue_doc(instance, "Price List", doc.price_list)
